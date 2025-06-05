@@ -1,31 +1,35 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, Button, StyleSheet } from 'react-native';
-import { MediaStream, RTCPeerConnection, mediaDevices } from 'react-native-webrtc';
+import { mediaDevices, RTCPeerConnection, RTCSessionDescription, RTCIceCandidate } from 'react-native-webrtc';
+import { createRoom, joinRoom } from '../utils/webrtcSignaling';
 
 export default function VoiceChatScreen({ route }) {
-  const { roomId } = route.params;
+  const { roomId, isHost } = route.params;
   const [isMuted, setIsMuted] = useState(false);
   const localStream = useRef(null);
-  const peerConnection = useRef(null);
+  const peerConnection = useRef(new RTCPeerConnection());
 
   useEffect(() => {
-    const startVoiceChat = async () => {
+    const init = async () => {
       const stream = await mediaDevices.getUserMedia({
         audio: true,
         video: false,
       });
 
       localStream.current = stream;
-      peerConnection.current = new RTCPeerConnection();
 
       stream.getTracks().forEach(track => {
         peerConnection.current.addTrack(track, stream);
       });
 
-      // TODO: Add Firebase signaling logic here
+      if (isHost) {
+        await createRoom(roomId, peerConnection.current);
+      } else {
+        await joinRoom(roomId, peerConnection.current);
+      }
     };
 
-    startVoiceChat();
+    init();
 
     return () => {
       if (localStream.current) {
@@ -43,7 +47,7 @@ export default function VoiceChatScreen({ route }) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Voice Chat Room: {roomId}</Text>
+      <Text style={styles.title}>Voice Room: {roomId}</Text>
       <Button title={isMuted ? 'Unmute Mic' : 'Mute Mic'} onPress={toggleMute} />
     </View>
   );
