@@ -1,16 +1,19 @@
 import React from 'react';
 import { View, Text, Button, StyleSheet } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import { AdMobBanner } from 'expo-ads-admob';
 import { AdMobConfig } from '../config/admob';
+import { v4 as uuidv4 } from 'uuid';
 
-export default function HomeScreen({ navigation }) {
+export default function CreateRoomScreen() {
+  const navigation = useNavigation();
+  const roomId = uuidv4().slice(0, 8);
+
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>🎧 Welcome to ShareStream</Text>
-      <View style={styles.buttonContainer}>
-        <Button title="Create Room" onPress={() => navigation.navigate('CreateRoom')} />
-        <Button title="Join Room" onPress={() => navigation.navigate('JoinRoom')} />
-      </View>
+      <Text style={styles.title}>🎤 Room Created</Text>
+      <Text style={styles.roomId}>Room ID: {roomId}</Text>
+      <Button title="Go to Room" onPress={() => navigation.navigate('Connected', { roomId })} />
       <AdMobBanner
         bannerSize="smartBannerPortrait"
         adUnitID={AdMobConfig.banner}
@@ -26,10 +29,10 @@ const styles = StyleSheet.create({
     flex: 1, justifyContent: 'center', alignItems: 'center',
   },
   title: {
-    fontSize: 24, fontWeight: 'bold', marginBottom: 20,
+    fontSize: 22, marginBottom: 10,
   },
-  buttonContainer: {
-    width: '80%', gap: 20, marginVertical: 20,
+  roomId: {
+    fontSize: 18, marginBottom: 20,
   },
   banner: {
     position: 'absolute', bottom: 0,
