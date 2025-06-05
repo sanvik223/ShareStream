@@ -1,31 +1,37 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { View, Text, Button, StyleSheet } from 'react-native';
-import { showInterstitialAd } from '../utils/admobService';
+import { AdMobBanner } from 'expo-ads-admob';
+import { AdMobConfig } from '../config/admob';
 
-export default function CreateRoom({ navigation }) {
-  useEffect(() => {
-    // Room তৈরি করার সাথে সাথে Interstitial Ad দেখানো
-    showInterstitialAd();
-  }, []);
-
-  const handleCreate = () => {
-    // আপনি চাইলে এখানে রুম আইড জেনারেট করতে পারেন
-    navigation.navigate('ConnectedScreen', { roomId: 'room-123' });
-  };
-
+export default function HomeScreen({ navigation }) {
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>Create Room Page</Text>
-      <Button title="Start Room" onPress={handleCreate} />
+      <Text style={styles.title}>🎧 Welcome to ShareStream</Text>
+      <View style={styles.buttonContainer}>
+        <Button title="Create Room" onPress={() => navigation.navigate('CreateRoom')} />
+        <Button title="Join Room" onPress={() => navigation.navigate('JoinRoom')} />
+      </View>
+      <AdMobBanner
+        bannerSize="smartBannerPortrait"
+        adUnitID={AdMobConfig.banner}
+        servePersonalizedAds
+        style={styles.banner}
+      />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1, alignItems: 'center', justifyContent: 'center',
+    flex: 1, justifyContent: 'center', alignItems: 'center',
   },
-  text: {
-    fontSize: 20, marginBottom: 20,
+  title: {
+    fontSize: 24, fontWeight: 'bold', marginBottom: 20,
+  },
+  buttonContainer: {
+    width: '80%', gap: 20, marginVertical: 20,
+  },
+  banner: {
+    position: 'absolute', bottom: 0,
   },
 });
